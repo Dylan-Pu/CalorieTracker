@@ -57,36 +57,44 @@ Route::middleware('auth')->group(function () {
 
     // 1. Page principale → toujours le formulaire (vide ou pas)
     Route::get('/calculator', function () {
+        $lastCalculation = auth()->user()->calculations()->latest()->first();
+        if (request()->has('reset')) {
+            return view('calculator.calculator');
+        }
+
+        if ($lastCalculation) {
+            return view('calculator.result', ['result' => $lastCalculation]);
+        }
+
         return view('calculator.calculator');
     })->name('calculator');
-
     // 2. Soumission du formulaire
-Route::post('/calculator', function (Request $request) {
-    $data = $request->validate([
-        'weight'   => 'required|numeric|min:30|max:200',
-        'bodyfat'  => 'required|numeric|min:5|max:50',
-        'activity' => 'required|numeric|in:1.2,1.375,1.55,1.725,1.9',
-        'deficit'  => 'required|numeric|min:5|max:25',
-    ]);
+    Route::post('/calculator', function (Request $request) {
+        $data = $request->validate([
+            'weight' => 'required|numeric|min:30|max:200',
+            'bodyfat' => 'required|numeric|min:5|max:50',
+            'activity' => 'required|numeric|in:1.2,1.375,1.55,1.725,1.9',
+            'deficit' => 'required|numeric|min:5|max:25',
+        ]);
 
-    $lbm      = $data['weight'] * (1 - $data['bodyfat'] / 100);
-    $bmr      = 370 + (21.6 * $lbm);
-    $tdee     = $bmr * $data['activity'];
-    $calories = round($tdee * (1 - $data['deficit'] / 100));
+        $lbm = $data['weight'] * (1 - $data['bodyfat'] / 100);
+        $bmr = 370 + (21.6 * $lbm);
+        $tdee = $bmr * $data['activity'];
+        $calories = round($tdee * (1 - $data['deficit'] / 100));
 
-    $proteins = round(($calories * 0.35) / 4);
-    $fats     = round(($calories * 0.25) / 9);
-    $carbs    = round(($calories * 0.40) / 4);
+        $proteins = round(($calories * 0.35) / 4);
+        $fats = round(($calories * 0.25) / 9);
+        $carbs = round(($calories * 0.40) / 4);
 
-    $calculation = auth()->user()->calculations()->create($data + [
-        'calories' => $calories,
-        'proteins' => $proteins,
-        'fats'     => $fats,
-        'carbs'    => $carbs,
-    ]);
+        $calculation = auth()->user()->calculations()->create($data + [
+            'calories' => $calories,
+            'proteins' => $proteins,
+            'fats' => $fats,
+            'carbs' => $carbs,
+        ]);
 
-    return redirect()->route('calculator.result', $calculation);
-})->name('calculator.store'); // ← C'EST TOUT !
+        return redirect()->route('calculator.result', $calculation);
+    })->name('calculator.store'); // ← C'EST TOUT !
 
     // 3. Affichage du résultat
     Route::get('/calculator/result/{calculation}', function (Calculation $calculation) {
