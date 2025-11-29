@@ -20,8 +20,7 @@
                 Calcul précis · Macros automatiques · Suivi illimité
             </p>
             <div class="space-y-4 text-lg text-white/80">
-                <p>• Les comptes seront detruits chaque debut de semaine</p>
-                <p>• Tous les calculs sont trouvables aisements sur internet</p>
+                 <p>• Tous les calculs sont trouvables aisements sur internet</p>
                 
             </div>
         </div>

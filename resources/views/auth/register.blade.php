@@ -82,7 +82,7 @@
 
             <p class="text-center mt-10 text-white/80 text-lg">
                 Déjà un compte ?
-                <a href="{{ route('login') }}" class="text-white font-bold hover:underline">Se connecter</a>
+                <a href="{{ route('home') }}" class="text-white font-bold hover:underline">Se connecter</a>
             </p>
         </div>
     </div>
